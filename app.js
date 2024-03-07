@@ -18,7 +18,7 @@ const watcher = chokidar.watch(watchFolder, { ignoreInitial: true });
 
 
 watcher.on('add', (path) => ConvertAndUpload(path))
-watcher.on('change', (path) => ConvertAndUpload(path))
+// watcher.on('change', (path) => ConvertAndUpload(path))
 
 
 async function ConvertAndUpload(filePath) {
@@ -35,7 +35,7 @@ async function ConvertAndUpload(filePath) {
 
 
     // Convert WAV to MP3 using ffmpeg
-    const ffmpegCommand = `${ffmpegPath} -i "${filePath}" -codec:a libmp3lame -qscale:a 2 "${mp3FilePath}"`;
+    const ffmpegCommand = `${ffmpegPath} -y -i "${filePath}" -codec:a libmp3lame -qscale:a 2 "${mp3FilePath}"`;
 
     try {
       // Execute the ffmpeg command
@@ -65,10 +65,15 @@ async function ConvertAndUpload(filePath) {
         console.error('Upload error:', error.message);
       })
       .finally(() => {
-        // Clean up: Delete the local files
-        fs.unlinkSync(mp3FilePath);
-        // fs.unlinkSync(filePath);
-        console.log(`Local file deleted: ${mp3FilePath}`);
+        try {
+          // Clean up: Delete the local files
+          fs.unlinkSync(mp3FilePath);
+          fs.unlinkSync(filePath);
+          console.log(`Local files deleted: ${filePath}, ${mp3FilePath}`);  
+        } catch (error) {
+          console.log(`Could not delete local file ${mp3FilePath}\n${error}`);
+        }
+        
       });
 
     } catch (error) {
