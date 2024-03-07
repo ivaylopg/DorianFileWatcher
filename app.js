@@ -12,7 +12,11 @@ const watcher = chokidar.watch(watchFolder, { ignoreInitial: true });
 
 
 
-watcher.on('add', async (filePath) => {
+watcher.on('add', (path) => ConvertAndUpload(path))
+watcher.on('change', (path) => ConvertAndUpload(path))
+
+
+async function ConvertAndUpload(filePath) {
   if (filePath.endsWith('.wav')) {
     console.log(`Detected new WAV file: ${filePath}`);
 
@@ -52,7 +56,7 @@ watcher.on('add', async (filePath) => {
       .finally(() => {
         // Clean up: Delete the local files
         fs.unlinkSync(mp3FilePath);
-        fs.unlinkSync(filePath);
+        // fs.unlinkSync(filePath);
         console.log(`Local files deleted: ${filePath}, ${mp3FilePath}`);
       });
 
@@ -60,7 +64,7 @@ watcher.on('add', async (filePath) => {
       console.error(`Error converting or uploading:`, error.message);
     }
   }
-});
+};
 
 watcher.on('error', (error) => {
   console.error(`Watcher error:`, error);
