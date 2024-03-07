@@ -2,6 +2,7 @@ const fs = require('fs');
 const chokidar = require('chokidar');
 const axios = require('axios');
 const ffmpegPath = require('ffmpeg-static');
+const FormData = require('form-data');
 
 const watchFolder = '/Users/ivaylopg/Desktop/DoriansOutput'; // Replace with the folder you want to watch
 const uploadUrl = 'http://192.168.88.230:5000/upload'; // Replace with your server's upload URL
@@ -28,20 +29,33 @@ watcher.on('add', async (filePath) => {
       console.log(`Conversion successful. Uploading MP3 to server...`);
 
       // Read the MP3 file as a stream
-      const mp3Stream = fs.createReadStream(mp3FilePath);
+      const formData = new FormData();
+      // const mp3Stream = fs.createReadStream(mp3FilePath);
+      formData.append('audioFile', fs.createReadStream(mp3FilePath));
 
       // Make a POST request to upload the MP3 file
-      const response = await axios.post(uploadUrl, mp3Stream, {
-        headers: {
-          'Content-Type': 'audio/mpeg',
-        },
+      // const response = await axios.post(uploadUrl, mp3Stream, {
+      //   headers: {
+      //     'Content-Type': 'audio/mpeg',
+      //   },
+      // });
+      console.log("Try Upload");
+      axios.post('http://192.168.88.230:5000/upload', formData, {
+        headers: formData.getHeaders(),
+      })
+      .then(response => {
+        console.log('Upload success:', response.data);
+      })
+      .catch(error => {
+        console.error('Upload error:', error.message);
+      })
+      .finally(() => {
+        // Clean up: Delete the local files
+        fs.unlinkSync(mp3FilePath);
+        fs.unlinkSync(filePath);
+        console.log(`Local files deleted: ${filePath}, ${mp3FilePath}`);
       });
 
-      console.log(`Upload response:`, response.data);
-
-      // Clean up: Delete the local MP3 file
-      fs.unlinkSync(mp3FilePath);
-      console.log(`Local MP3 file deleted: ${mp3FilePath}`);
     } catch (error) {
       console.error(`Error converting or uploading:`, error.message);
     }
@@ -58,8 +72,10 @@ function runCommand(command) {
     const childProcess = require('child_process').exec(command, (error, stdout, stderr) => {
       if (error) {
         reject(error);
+        console.log("Process Error");
       } else {
         resolve();
+        console.log("ProcessDone");
       }
     });
 
