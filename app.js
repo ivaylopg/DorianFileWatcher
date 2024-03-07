@@ -3,8 +3,13 @@ const chokidar = require('chokidar');
 const axios = require('axios');
 const ffmpegPath = require('ffmpeg-static');
 const FormData = require('form-data');
+const path = require('path');
 
-const watchFolder = '/Users/ivaylopg/Desktop/DoriansOutput'; // Replace with the folder you want to watch
+
+const jsonData = require('./watcherConfig.json');
+// console.log(jsonData);
+
+const watchFolder = jsonData["watchFolder"]; // Replace with the folder you want to watch
 const uploadUrl = 'http://192.168.88.230:5000/upload'; // Replace with your server's upload URL
 
 // Watch the folder for new WAV files
@@ -19,9 +24,15 @@ watcher.on('change', (path) => ConvertAndUpload(path))
 async function ConvertAndUpload(filePath) {
   if (filePath.endsWith('.wav')) {
     console.log(`Detected new WAV file: ${filePath}`);
+    let baseName = path.basename(filePath, path.extname(filePath));
+    let destination = jsonData["dorianIps"][baseName]
+    // console.log(baseName);
+    console.log(destination);
+
 
     // Generate the output MP3 filename
     const mp3FilePath = filePath.replace('.wav', '.mp3');
+
 
     // Convert WAV to MP3 using ffmpeg
     const ffmpegCommand = `${ffmpegPath} -i "${filePath}" -codec:a libmp3lame -qscale:a 2 "${mp3FilePath}"`;
@@ -57,7 +68,7 @@ async function ConvertAndUpload(filePath) {
         // Clean up: Delete the local files
         fs.unlinkSync(mp3FilePath);
         // fs.unlinkSync(filePath);
-        console.log(`Local files deleted: ${filePath}, ${mp3FilePath}`);
+        console.log(`Local file deleted: ${mp3FilePath}`);
       });
 
     } catch (error) {

@@ -1,0 +1,14 @@
+{
+    "watchFolder":"/Users/ivaylopg/Desktop/DoriansOutput",
+    "dorianIps":{
+        "dorian_1":"http://192.168.88.230:5000/upload",
+        "dorian_2":"http://192.168.88.22:5000/upload",
+        "dorian_3":"http://192.168.88.23:5000/upload",
+        "dorian_4":"http://192.168.88.24:5000/upload",
+        "dorian_5":"http://192.168.88.25:5000/upload",
+        "dorian_6":"http://192.168.88.26:5000/upload",
+        "dorian_7":"http://192.168.88.27:5000/upload",
+        "dorian_8":"http://192.168.88.28:5000/upload",
+        "dorian_9":"http://192.168.88.29:5000/upload"
+    }
+}
