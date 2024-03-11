@@ -10,7 +10,6 @@ const jsonData = require('./watcherConfig.json');
 // console.log(jsonData);
 
 const watchFolder = jsonData["watchFolder"]; // Replace with the folder you want to watch
-const uploadUrl = 'http://192.168.88.230:5000/upload'; // Replace with your server's upload URL
 
 // Watch the folder for new WAV files
 const watcher = chokidar.watch(watchFolder, { ignoreInitial: true });
@@ -55,7 +54,7 @@ async function ConvertAndUpload(filePath) {
       //   },
       // });
       console.log("Try Upload");
-      axios.post('http://192.168.88.230:5000/upload', formData, {
+      axios.post(destination, formData, {
         headers: formData.getHeaders(),
       })
       .then(response => {
@@ -92,10 +91,10 @@ function runCommand(command) {
     const childProcess = require('child_process').exec(command, (error, stdout, stderr) => {
       if (error) {
         reject(error);
-        console.log("Process Error");
+        console.log("Command error!");
       } else {
         resolve();
-        console.log("ProcessDone");
+        console.log("Command Completed");
       }
     });
 
