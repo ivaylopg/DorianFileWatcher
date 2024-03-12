@@ -17,7 +17,7 @@ const watcher = chokidar.watch(watchFolder, { ignoreInitial: true });
 
 
 watcher.on('add', (path) => ConvertAndUpload(path))
-// watcher.on('change', (path) => ConvertAndUpload(path))
+watcher.on('change', (path) => ConvertAndUpload(path))
 
 
 async function ConvertAndUpload(filePath) {
