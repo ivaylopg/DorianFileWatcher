@@ -12,17 +12,39 @@ const jsonData = require('./watcherConfig.json');
 const watchFolder = jsonData["watchFolder"]; // Replace with the folder you want to watch
 
 // Watch the folder for new WAV files
-const watcher = chokidar.watch(watchFolder, { ignoreInitial: true });
+const watcher = chokidar.watch(watchFolder, 
+  { ignoreInitial: true,
+    awaitWriteFinish: {
+      stabilityThreshold: 1000,
+      pollInterval: 100
+    } 
+  });
 
 
 
 watcher.on('add', (path) => ConvertAndUpload(path))
 watcher.on('change', (path) => ConvertAndUpload(path))
 
+// processing_requests = []
+
+// watcher.on('all', (event, path) => {
+//   if ((event == 'change' || event == 'add') && !processing_requests.includes(path)) {
+//       processing_requests.push(path);
+//       ConvertAndUpload(path);
+//       setTimeout(function(path) {
+//         console.log(">>>>>>>>>>><<<<<<<<<<<");
+//         processing_requests = processing_requests.filter(x => x != path);
+//         console.log(processing_requests);
+//         console.log(">>>>>>>>>>><<<<<<<<<<<");
+//       }, 5000);
+//   }
+// });
+
 
 async function ConvertAndUpload(filePath) {
   if (filePath.endsWith('.wav')) {
-    console.log(`Detected new WAV file: ${filePath}`);
+    console.log(`Detected new or changed WAV file: ${filePath}`);
+
     let baseName = path.basename(filePath, path.extname(filePath));
     let destination = jsonData["dorianIps"][baseName]
     // console.log(baseName);
